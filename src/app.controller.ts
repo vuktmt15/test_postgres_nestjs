@@ -1,8 +1,15 @@
-import { Controller, Get, Post, UseGuards, Request, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+  Body,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { LocalAuthGuard } from './auth/local-auth.guard';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { LoginUser, RegisterUser } from "./users/users.dto";
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { LoginUser, RegisterUser } from './users/users.dto';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { UsersService } from './users/users.service';
@@ -15,7 +22,9 @@ export class AppController {
     private readonly userService: UsersService,
   ) {}
 
+  //Get/ Hello-world
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get()
   getHello(): string {
     return this.appService.getHello();
@@ -26,8 +35,8 @@ export class AppController {
   @ApiTags('Login')
   @ApiBody({ type: LoginUser })
   @Post('login')
-  login(@Request() req): any {
-    return this.authService.login(req.user);
+  login(@Body() user: LoginUser): any {
+    return this.authService.validateUser(user.username, user.password);
   }
 
   //Post/ Register
